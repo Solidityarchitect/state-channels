@@ -52,7 +52,7 @@ const { ethers } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS.sepolia; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -475,6 +475,16 @@ function App(props) {
        *  and then use ethers.utils.verifyMessage() to confirm that voucher signer was
        *  `clientAddress`. (If it wasn't, log some error message and return).
       */
+      const packed = ethers.utils.solidityPack(["uint256"], [updatedBalance]);
+      const hashed = ethers.utils.keccak256(packed);
+      const arrayified = ethers.utils.arrayify(hashed);
+      const signature = ethers.utils.verifyMessage(arrayified, voucher.data.signature);
+      if(signature == clientAddress){
+        console.log(signature)
+      } else {
+        console.log("verifiedMessage is not clientAddress")
+        return
+      }
 
       const existingVoucher = vouchers()[clientAddress];
 
@@ -531,7 +541,14 @@ function App(props) {
     const channelInput = document.getElementById("input-" + clientAddress);
     if (channelInput) {
       const wisdom = channelInput.value;
+      const bestVoucherOfSize = Math.max(wisdom.length, 501);
       // console.log("sending: %s", wisdom);
+
+      if(bestVoucherOfSize <= wisdom.length){
+        console.log(`Client ${clientAddress} did not provide enough payment. Cutting off service`)
+        return
+      }
+      
       channels[clientAddress].postMessage(wisdom);
       document.getElementById(`provided-${clientAddress}`).innerText = wisdom.length;
     } else {
@@ -800,7 +817,6 @@ function App(props) {
                         </div>
                       </Card>
 
-                      {/* Checkpoint 5:
                       <Button
                         style={{ margin: 5 }}
                         type="primary"
@@ -811,7 +827,7 @@ function App(props) {
                         }}
                       >
                         Cash out latest voucher
-                      </Button> */}
+                      </Button>
                     </List.Item>
                   )}
                 ></List>
@@ -853,8 +869,6 @@ function App(props) {
                         </Card>
                       </Col>
 
-                      {/* Checkpoint 6: challenge & closure
-
                       <Col span={5}>
                         <Button
                           disabled={hasClosingChannel()}
@@ -887,7 +901,7 @@ function App(props) {
                         >
                           Close and withdraw funds
                         </Button>
-                      </Col> */}
+                      </Col> 
                     </Row>
                   </div>
                 ) : hasClosedChannel() ? (

@@ -19,13 +19,15 @@
     "@tenderly/hardhat-tenderly": "^1.0.10",
     "chai": "^4.2.0",
     "chalk": "^4.1.0",
+    "dotenv": "^16.3.1",
     "ethereum-waffle": "^3.1.1",
     "ethers": "^5.4.4",
     "hardhat": "2.6.0",
     "hardhat-deploy": "^0.11.23",
     "node-watch": "^0.7.0",
     "qrcode-terminal": "^0.12.0",
-    "ramda": "^0.27.1"
+    "ramda": "^0.27.1",
+    "undici": "^5.23.0"
   },
   "scripts": {
     "chain": "hardhat node --network hardhat --no-deploy --hostname 127.0.0.1",
